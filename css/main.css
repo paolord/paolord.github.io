@@ -1,0 +1,40 @@
+a:hover {
+  text-decoration: underline;
+}
+.chip a:hover {
+  text-decoration: none;
+}
+header {
+  padding-top: 30px;
+  background-color: #0277bd;
+  border-color: #ffffff;
+}
+header a {
+  color: #82BDE8;
+}
+header h4 {
+  color: #fffefb;
+}
+.profile-pic {
+  border: 3px;
+  border-style: solid;
+  border-color: #ffffff;
+  border-radius: 90px;
+}
+.main section {
+    padding-bottom: 25px;
+    font-weight: 500;
+}
+.main section p {
+  line-height: 25px;
+  font-size: 14px;
+}
+.main ul {
+  padding-left: 20px;
+}
+.main ul li {
+  list-style-type: disc;
+}
+.main h6 {
+  font-size: 1.4em;
+}
