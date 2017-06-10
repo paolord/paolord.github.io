@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html ng-app="ngMap">
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<script src="https://maps.google.com/maps/api/js?key=AIzaSyDPMXImO_pUlFjOFDZlesWGbh3b6hfgq80&libraries=placeses,visualization,drawing,geometry,places"></script>
+<script src="libs/angular.min.js"></script>
+<script src="libs/ng-map.js"></script>
+<link rel="stylesheet" type="text/css" href="styles/main.css" />
+<script>
+angular.module('ngMap').run(function($rootScope, NgMap) {
+  NgMap.getMap().then(function(map) {
+    $rootScope.map = map;
+  });
+}).controller('mainController', ['$scope', function($scope){
+  $scope.mapBuffer = $scope.map;
+  $scope.all = true;
+  $scope.seafood = true;
+  $scope.streetfood = true;
+  $scope.desserts = true;
+  $scope.noodles = true;
+  $scope.pasta = true;
+  $scope.burger = true;
+  $scope.lechon = true;
+  $scope.pizza = true;
+  $scope.steaks = true;
+  $scope.vegetarian = true;
+
+  $scope.changeAll = function() {
+    !$scope.all;
+    $scope.seafood = $scope.all;
+    $scope.change('seafood');
+    $scope.streetfood = $scope.all;
+    $scope.change('streetfood');
+    $scope.desserts = $scope.all;
+    $scope.change('desserts');
+    $scope.noodles = $scope.all;
+    $scope.change('noodles');
+    $scope.pasta = $scope.all;
+    $scope.change('pasta');
+    $scope.burger = $scope.all;
+    $scope.change('burger');
+    $scope.lechon = $scope.all;
+    $scope.change('lechon');
+    $scope.pizza = $scope.all;
+    $scope.change('pizza');
+    $scope.steaks = $scope.all;
+    $scope.change('steaks');
+    $scope.vegetarian = $scope.all;
+    $scope.change('vegetarian');
+  }
+
+  $scope.change = function(markerClass) {
+    for (var key in $scope.map.markers) {
+      if (!$scope.map.markers.hasOwnProperty(key)) continue;
+
+      var obj = $scope.map.markers[key];
+      for (var prop in obj) {
+        // skip loop if the property is from prototype
+        if(!obj.hasOwnProperty(prop)) continue;
+        if(prop === 'class' && markerClass === obj.class){
+          if ($scope[markerClass]) {
+            $scope.map.markers[key].setMap($scope.map);
+          } else {
+            $scope.map.markers[key].setMap(null);
+          }
+        }
+      }
+    }
+  };
+
+  $scope.showDirections = function(markerId) {
+    console.log($scope.map.markers[markerId].position.toString());
+    console.log($scope.map.markers[markerId].position.lat()+', '+$scope.map.markers[markerId].position.lng());
+    $scope.map.directionsRenderers[0].setMap($scope.map);
+    $scope.origin = 'current-location';
+    $scope.destination = $scope.map.markers[markerId].position.lat()+', '+$scope.map.markers[markerId].position.lng();
+  };
+  $scope.clearDirections = function() {
+    $scope.origin = '';
+    $scope.destination = '';
+    console.log($scope.map);
+    console.log($scope.map.directionsRenderers[0]);
+    $scope.map.directionsRenderers[0].setMap(null);
+  }
+}]);
+</script>
+</head>
+
+<body>
+  <div class="mainContainer" ng-controller="mainController">
+    <div id="sidebar">
+      <ul>
+        <li>
+          <input type="checkbox" ng-model="all" ng-change="changeAll()"/>
+          <label>All</label>
+        </li>
+        <li>
+          <input type="checkbox" ng-model="seafood" ng-change="change('seafood')"/>
+          <label>Seafood</label>        </li>
+        <li>
+          <input type="checkbox" ng-model="streetfood" ng-change="change('streetfood')"/>
+          <label>Street Food</label>
+        </li>
+        <li>
+          <input type="checkbox" ng-model="desserts" ng-change="change('desserts')"/>
+          <label>Desserts</label>
+        </li>
+        <li>
+          <input type="checkbox" ng-model="noodles" ng-change="change('noodles')"/>
+          <label>Noodles</label>
+        </li>
+        <li>
+          <input type="checkbox" ng-model="pasta" ng-change="change('pasta')"/>
+          <label>Pasta</label>
+        </li>
+        <li>
+          <input type="checkbox" ng-model="burger" ng-change="change('burger')"/>
+          <label>Burger</label>
+        </li>
+        <li>
+          <input type="checkbox" ng-model="lechon" ng-change="change('lechon')"/>
+          <label>Lechon</label>
+        </li>
+        <li>
+          <input type="checkbox" ng-model="pizza" ng-change="change('pizza')"/>
+          <label>Pizza</label>
+        </li>
+        <li>
+          <input type="checkbox" ng-model="steaks" ng-change="change('steaks')"/>
+          <label>Steaks</label>
+        </li>
+        <li>
+          <input type="checkbox" ng-model="vegetarian" ng-change="change('vegetarian')"/>
+          <label>Vegetarian</label>
+        </li>
+        <li>
+          <button ng-click="clearDirections()">Clear Directions</button>
+        </li>
+      </ul>
+    </div>
+    <ng-map zoom="13" center="10.3356569,123.9193992" id="mainMap">
+      <directions
+        draggable="true"
+        travel-mode="DRIVING"
+        origin="{{origin}}"
+        destination="{{destination}}">
+      </directions>
+      <marker position="10.311316, 123.916461"
+        id="parrtebelle"
+        icon="/restos/img/seafood-marker.png"
+        class="seafood"
+        on-click="map.showInfoWindow('parrtebelle-info')">
+      </marker>
+      <info-window id="parrtebelle-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Parr't Ebelle Tinola</h1>
+          <div id="bodyContent">
+            <p>J. De Veyra St, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('parrtebelle')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.322528, 123.904417"
+        id="islasugbo"
+        icon="/restos/img/seafood-marker.png"
+        class="seafood"
+        on-click="map.showInfoWindow('islasugbo-info')">
+      </marker>
+      <info-window id="islasugbo-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Isla Sugbo Seafood City</h1>
+          <div id="bodyContent">
+            <p>Archbishop Reyes Ave, Cebu City, Cebu</p>
+            <button ng-click="showDirections('islasugbo')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.335123, 123.950294"
+        id="oysterbay"
+        icon="/restos/img/seafood-marker.png"
+        class="seafood"
+        on-click="map.showInfoWindow('oysterbay-info')">
+      </marker>
+      <info-window id="oysterbay-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Oyster Bay Seafood Restaurant</h1>
+          <div id="bodyContent">
+            <p>Bridge Town Square, Plaridel St, Mandaue City, 6014 Cebu</p>
+            <button ng-click="showDirections('oysterbay')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.338888, 123.932677"
+        id="Ocean Garden"
+        icon="/restos/img/seafood-marker.png"
+        class="seafood"
+        on-click="map.showInfoWindow('oceangarden-info')">
+      </marker>
+      <info-window id="oceangarden-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Ocean Garden</h1>
+          <div id="bodyContent">
+            <p>A. S. Fortuna St, Vpper Bakilid, Mandaue City, 6014 Cebu</p>
+            <button ng-click="showDirections('Ocean Garden')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.351525, 123.893970"
+        id="marina"
+        icon="/restos/img/seafood-marker.png"
+        class="seafood"
+        on-click="map.showInfoWindow('marina-info')">
+      </marker>
+      <info-window id="marina-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Marina Seafood Restaurant</h1>
+          <div id="bodyContent">
+            <p>Barangay Busay Nivel Hills, Cebu City</p>
+            <button ng-click="showDirections('marina')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+
+
+      <marker position="10.351525, 123.893970"
+        id="larsian"
+        icon="/restos/img/street-marker.png"
+        class="streetfood"
+        on-click="map.showInfoWindow('larsian-info')">
+      </marker>
+      <info-window id="larsian-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Larsian</h1>
+          <div id="bodyContent">
+            <p>Don Mariano Cui St, Cebu City, Cebu</p>
+            <button ng-click="showDirections('larsian')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+
+      <marker position="10.313373, 123.890822"
+        id="zoetcakes"
+        icon="/restos/img/dessert-marker.png"
+        class="desserts"
+        on-click="map.showInfoWindow('zoetcakes-info')">
+      </marker>
+      <info-window id="zoetcakes-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Zoet Cakes and Pastries</h1>
+          <div id="bodyContent">
+            <p>0335 Don Mariano Cui St., Capitol Site, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('zoetcakes')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.318266, 123.905286"
+        id="Dessert Factory"
+        icon="/restos/img/dessert-marker.png"
+        class="desserts"
+        on-click="map.showInfoWindow('dessertfactory-info')"
+        class='dessert'>
+      </marker>
+      <info-window id="dessertfactory-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Dessert Factory</h1>
+          <div id="bodyContent">
+            <p>Ayala Center Cebu The Terraces, Cebu Business Park, Archbishop Reyes Ave, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('Dessert Factory')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.328194, 123.905944"
+        id="La Marea"
+        icon="/restos/img/dessert-marker.png"
+        class="desserts"
+        on-click="map.showInfoWindow('lamarea-info')">
+      </marker>
+      <info-window id="lamarea-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">La Marea</h1>
+          <div id="bodyContent">
+            <p>The Walk, Abad St, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('La Marea')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.282470, 123.881069"
+        id="roomfordessert"
+        icon="/restos/img/dessert-marker.png"
+        class="desserts"
+        on-click="map.showInfoWindow('roomfordessert-info')">
+      </marker>
+      <info-window id="roomfordessert-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Room for Dessert</h1>
+          <div id="bodyContent">
+            <p>3rd Floor, Skypark Area, SM Seaside City Cebu, Cebu South Coastal Rd, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('roomfordessert')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+
+      <marker position="10.350355, 123.924668"
+        id="nonki"
+        icon="/restos/img/noodles-marker.png"
+        class="noodles"
+        on-click="map.showInfoWindow('nonki-info')">
+      </marker>
+      <info-window id="nonki-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Nonki Japanese Restaurant</h1>
+          <div id="bodyContent">
+            <p>219 A. S. Fortuna Street, Bakilid, Mandaue City, Cebu, Mandaue City, Cebu</p>
+            <button ng-click="showDirections('nonki')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.330747, 123.898659"
+        id="Ikkousha Ramen Cebu"
+        icon="/restos/img/noodles-marker.png"
+        class="noodles"
+        on-click="map.showInfoWindow('ikkousha-info')">
+      </marker>
+      <info-window id="ikkousha-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Ikkousha Ramen Cebu</h1>
+          <div id="bodyContent">
+            <p>JY Square IT Center, 1 Salinas Dr, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('Ikkousha Ramen Cebu')">Directions</button>
+          </div>
+        </div>
+      </info-window><marker position="10.328665, 123.909240"
+        id="banri"
+        icon="/restos/img/noodles-marker.png"
+        class="noodles"
+        on-click="map.showInfoWindow('banri-info')">
+      </marker>
+      <info-window id="banri-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Banri Noodle House</h1>
+          <div id="bodyContent">
+            <p>Crossroads Mall, Governor Cuenco Avenue, Banilad, Cebu City, 6000, Cebu</p>
+            <button ng-click="showDirections('banri')">Directions</button>
+          </div>
+        </div>
+      </info-window><marker position="10.342860, 123.918063"
+        id="yushoken"
+        icon="/restos/img/noodles-marker.png"
+        class="noodles"
+        on-click="map.showInfoWindow('yushoken-info')">
+      </marker>
+      <info-window id="yushoken-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Ramen Yushoken Cebu</h1>
+          <div id="bodyContent">
+            <p>G/F Oakridge Business Park, 880 A. S. Fortuna St, Mandaue City, 6014 Cebu</p>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.351430, 123.923792"
+        id="sachi"
+        icon="/restos/img/noodles-marker.png"
+        class="noodles"
+        on-click="map.showInfoWindow('sachi-info')">
+      </marker>
+      <info-window id="sachi-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Sachi Authentic Japanese Ramen and Okonomiyaki</h1>
+          <div id="bodyContent">
+            <p>M. L. Quezon Ave, Mandaue City, Cebu</p>
+            <button ng-click="showDirections('sachi')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.336250, 123.934008"
+        id="siknoy"
+        icon="/restos/img/noodles-marker.png"
+        class="noodles"
+        on-click="map.showInfoWindow('siknoy-info')">
+      </marker>
+      <info-window id="siknoy-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Siknoy Noodle House</h1>
+          <div id="bodyContent">
+            <p>2nd Level, Unit 197, J Centre Mall (Veranda Side), 165 A. S. Fortuna St, Mandaue City, 6014 Cebu</p>
+            <button ng-click="showDirections('siknoy')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.331206, 123.899313"
+        id="fungs"
+        icon="/restos/img/noodles-marker.png"
+        class="noodles"
+        on-click="map.showInfoWindow('fungs-info')">
+      </marker>
+      <info-window id="fungs-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Fung's Noodle House</h1>
+          <div id="bodyContent">
+            <p>Unit 3, SSY Business Center, Salinas Dr, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('fungs')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+
+      <marker position="10.324725, 123.904655"
+        id="lagondola"
+        icon="/restos/img/pasta-marker.png"
+        class="pasta"
+        on-click="map.showInfoWindow('lagondola-info')">
+      </marker>
+      <info-window id="lagondola-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">La Gondola</h1>
+          <div id="bodyContent">
+            <p>Waterfront, Salinas Dr, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('lagondola')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.321214, 123.900104"
+        id="labouna"
+        icon="/restos/img/pasta-marker.png"
+        class="pasta"
+        on-click="map.showInfoWindow('labouna-info')">
+      </marker>
+      <info-window id="labouna-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">La Bouna Italian Restaurant</h1>
+          <div id="bodyContent">
+            <p>Advent Business Center, 139 Acacia Street, Kamputhaw, Cebu City, Cebu, Acacia St, Cebu City, Cebu</p>
+            <button ng-click="showDirections('labouna')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.341897, 123.919644"
+        id="tavolata"
+        icon="/restos/img/pasta-marker.png"
+        class="pasta"
+        on-click="map.showInfoWindow('tavolata-info')">
+      </marker>
+      <info-window id="tavolata-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Tavolata</h1>
+          <div id="bodyContent">
+            <p>Design Center of Cebu AS Fortuna at, P.Remedio St, Mandaue City, 6000 Cebu</p>
+            <button ng-click="showDirections('tavolata')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.344124, 123.909581"
+        id="giuseppe"
+        icon="/restos/img/pasta-marker.png"
+        class="pasta"
+        on-click="map.showInfoWindow('giuseppe-info')">
+      </marker>
+      <info-window id="giuseppe-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Giuseppe Pizzeria &amp; Sicillian Roast</h1>
+          <div id="bodyContent">
+            <p>Paseo Saturnino, Maria Luisa Road, Cebu</p>
+            <button ng-click="showDirections('guiseppe')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.317666, 123.893737"
+        id="michelangelo"
+        icon="/restos/img/pasta-marker.png"
+        class="pasta"
+        on-click="map.showInfoWindow('michelangelo-info')">
+      </marker>
+      <info-window id="michelangelo-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Pizzeria Michelangelo</h1>
+          <div id="bodyContent">
+            <p>8, Escanio Central, N Escario St, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('michelangelo')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.311432, 123.898689"
+        id="Vienna"
+        icon="/restos/img/pasta-marker.png"
+        class="pasta"
+        on-click="map.showInfoWindow('vienna-info')">
+      </marker>
+      <info-window id="vienna-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Vienna</h1>
+          <div id="bodyContent">
+            <p>General Maxilom Ave, Cebu City, Cebu</p>
+            <button ng-click="showDirections('Vienna')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+
+      <marker position="10.314524, 123.894693"
+        id="burgaholic"
+        icon="/restos/img/burger-marker.png"
+        class="burger"
+        on-click="map.showInfoWindow('burgaholic-info')">
+      </marker>
+      <info-window id="burgaholic-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Burgaholic Chargrilled Burgers</h1>
+          <div id="bodyContent">
+            <p>173 Maria Christina Ext St, Cebu City</p>
+            <button ng-click="showDirections('burgaholic')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.316600, 123.893697"
+        id="bigtom"
+        icon="/restos/img/burger-marker.png"
+        class="burger"
+        on-click="map.showInfoWindow('bigtom-info')">
+      </marker>
+      <info-window id="bigtom-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Big Tom's Charbroiled Burger</h1>
+          <div id="bodyContent">
+            <p>Juana Osmeña St., Cebu City</p>
+            <button ng-click="showDirections('bigtom')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.324457, 123.909402"
+        id="burgerjoint"
+        icon="/restos/img/burger-marker.png"
+        class="burger"
+        on-click="map.showInfoWindow('burgerjoint-info')">
+      </marker>
+      <info-window id="burgerjoint-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">The Burger Joint</h1>
+          <div id="bodyContent">
+            <p>The Gallery, Golam St. Corner Juan Luna Ave., Cebu City</p>
+            <button ng-click="showDirections('burgerjoint')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.318655, 123.905230"
+        id="flameit"
+        icon="/restos/img/burger-marker.png"
+        class="burger"
+        on-click="map.showInfoWindow('flameit-info')">
+      </marker>
+      <info-window id="flameit-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Flame It! Burger</h1>
+          <div id="bodyContent">
+            <p>Ayala Center Cebu, Cebu City</p>
+            <button ng-click="showDirections('flameit')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.310904, 123.919072"
+        id="zarks"
+        icon="/restos/img/burger-marker.png"
+        class="burger"
+        on-click="map.showInfoWindow('zarks-info')">
+      </marker>
+      <info-window id="zarks-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Zark's Burger</h1>
+          <div id="bodyContent">
+            <p>SM CIty Cebu, Cebu City, 6000 Cebu </p>
+            <button ng-click="showDirections('zarks')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.320108, 123.904781"
+        id="casaverde"
+        icon="/restos/img/burger-marker.png"
+        class="burger"
+        on-click="map.showInfoWindow('casaverde-info')">
+      </marker>
+      <info-window id="casaverde-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Casa Verde</h1>
+          <div id="bodyContent">
+            <p>The Walk, IT Park, Cebu City</p>
+            <button ng-click="showDirections('casaverde')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.312805, 123.894819"
+        id="frontgate"
+        icon="/restos/img/burger-marker.png"
+        class="burger"
+        on-click="map.showInfoWindow('frontgate-info')">
+      </marker>
+      <info-window id="frontgate-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Frontgate</h1>
+          <div id="bodyContent">
+            <p>Roseline Residences, Juana Osmeña St, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('frontgate')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.331168, 123.905515"
+        id="armynavy"
+        icon="/restos/img/burger-marker.png"
+        class="burger"
+        on-click="map.showInfoWindow('armynavy-info')">
+      </marker>
+      <info-window id="armynavy-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Army Navy Burger and Burrito</h1>
+          <div id="bodyContent">
+            <p>6000 Metro, W Geonzon St, Apas, Cebu City, Cebu</p>
+            <button ng-click="showDirections('armynavy')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+
+      <marker position="10.325001, 123.918885"
+        id="ricos"
+        icon="/restos/img/lechon-marker.png"
+        class="lechon"
+        on-click="map.showInfoWindow('ricos-info')">
+      </marker>
+      <info-window id="ricos-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Rico's Lechon</h1>
+          <div id="bodyContent">
+            <p>F. Cabahug St, Cebu City, Cebu</p>
+            <button ng-click="showDirections('ricos')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.326362, 123.882714"
+        id="cnt"
+        icon="/restos/img/lechon-marker.png"
+        class="lechon"
+        on-click="map.showInfoWindow('cnt-info')">
+      </marker>
+      <info-window id="cnt-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">CnT Lechon</h1>
+          <div id="bodyContent">
+            <p>V Rama Ave, Cebu City, Cebu</p>
+            <button ng-click="showDirections('cnt')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.310224, 123.896913"
+        id="zubuchon"
+        icon="/restos/img/lechon-marker.png"
+        class="lechon"
+        on-click="map.showInfoWindow('zubuchon-info')">
+      </marker>
+      <info-window id="zubuchon-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Zubuchon Lechon</h1>
+          <div id="bodyContent">
+            <p>One Mango Mall, General Maxilom Ave, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('zubuchon')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.317669, 123.902312"
+        id="house"
+        icon="/restos/img/lechon-marker.png"
+        class="lechon"
+        on-click="map.showInfoWindow('house-info')">
+      </marker>
+      <info-window id="house-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">House of Lechon</h1>
+          <div id="bodyContent">
+            <p>Acacia St, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('house')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.361210, 123.915220"
+        id="ayers"
+        icon="/restos/img/lechon-marker.png"
+        class="lechon"
+        on-click="map.showInfoWindow('ayers-info')">
+      </marker>
+      <info-window id="ayers-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Ayer's Lechon</h1>
+          <div id="bodyContent">
+            <p>Banilad Road, Cebu City, Cebu</p>
+            <button ng-click="showDirections('ayers')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+
+      <marker position="10.320609, 123.899140"
+        id="handuraw"
+        icon="/restos/img/pizza-marker.png"
+        class="pizza"
+        on-click="map.showInfoWindow('handuraw-info')">
+      </marker>
+      <info-window id="handuraw-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Handuraw Pizza</h1>
+          <div id="bodyContent">
+            <p>Gorordo Avenue, Camputhaw, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('handuraw')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.329411, 123.902754"
+        id="pizzarepublic"
+        icon="/restos/img/pizza-marker.png"
+        class="pizza"
+        on-click="map.showInfoWindow('pizzarepublic-info')">
+      </marker>
+      <info-window id="-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Pizza Republic Pick + Mix</h1>
+          <div id="bodyContent">
+            <p>Salinas Dr, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('pizzarepublic')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+
+      <marker position="10.336113, 123.910332"
+        id="olio"
+        icon="/restos/img/steak-marker.png"
+        class="steaks"
+        on-click="map.showInfoWindow('olio-info')">
+      </marker>
+      <info-window id="olio-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Olio Restaurant</h1>
+          <div id="bodyContent">
+            <p>Unit T Crossroad Mall, Banilad, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('olio')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.300820, 123.898388"
+        id="mooshy"
+        icon="/restos/img/steak-marker.png"
+        class="steaks"
+        on-click="map.showInfoWindow('mooshy-info')">
+      </marker>
+      <info-window id="mooshy-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Mooshy Steakhauz</h1>
+          <div id="bodyContent">
+            <p>P Del Rosario St, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('mooshy')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+      <marker position="10.323411, 123.891875"
+        id="acacia"
+        icon="/restos/img/steak-marker.png"
+        class="steaks"
+        on-click="map.showInfoWindow('acacia-info')">
+      </marker>
+      <info-window id="acacia-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Acacia Steakhouse</h1>
+          <div id="bodyContent">
+            <p>Acacia St. Green Valley Subdivision, Cebu City, Cebu</p>
+            <button ng-click="showDirections('acacia')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+
+      <marker position="10.302421, 123.889108"
+        id="healthy"
+        icon="/restos/img/vegetarian-marker.png"
+        class="vegetarian"
+        on-click="map.showInfoWindow('healthy-info')">
+      </marker>
+      <info-window id="healthy-info">
+        <div ng-non-bindable>
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">Healthy U' Vegetarian Delights Resto</h1>
+          <div id="bodyContent">
+            <p>A Tormis St, Cebu City, 6000 Cebu</p>
+            <button ng-click="showDirections('healthy')">Directions</button>
+          </div>
+        </div>
+      </info-window>
+
+    </ng-map>
+  </div>
+</body>
+</html>
